@@ -1,0 +1,82 @@
+[recon] Calling LLM (prompt: 163310 chars)...
+[recon] LLM returned 5831 chars
+[recon] parse_json -> list, len=6
+[recon] Build has 7 contracts
+[recon] filtered 0 hallucinated tasks, 6 remain
+[recon] 6 tasks
+[hunt] reentrancy -> EmberETHVault (challenge: embereth)
+  [scaffold] Generating generic scaffold...
+[scaffold] Compiles after 1 attempt(s)
+  [invariants] 5 generated
+    [critical] no-free-withdraw
+    [critical] total-supply-consistency
+    [high] owner-not-locked
+    [high] deposit-withdraw-symmetry
+    [high] no-arithmetic-overflow
+  [hunt] Running Hunt on generic scaffold...
+[hunt] reentrancy -> EmberVault (challenge: ember)
+  [scaffold] Generating generic scaffold...
+[scaffold] Compiles after 1 attempt(s)
+  [invariants] 5 generated
+    [critical] no-free-withdraw
+    [critical] total-supply-consistency
+    [high] owner-not-locked
+    [high] deposit-withdraw-symmetry
+    [high] no-arithmetic-overflow
+  [hunt] Running Hunt on generic scaffold...
+  [04:29:49] attempt 1/2: exploitable=true, body_len=1489, reason=The EmberETHVault's `processWithdrawalRequests` function unw
+  [04:29:50] failed [EXECUTION_FAILURE]
+  [04:30:05] attempt 1/2: exploitable=true, body_len=0, reason=
+  [04:30:17] attempt 2/2: exploitable=, body_len=165, reason=The EmberETHVault contract has a reentrancy vulnerability in
+[hunt] access_control -> EmberETHVault (challenge: embereth)
+  [scaffold] Generating generic scaffold...
+[scaffold] Compiles after 1 attempt(s)
+  [invariants] 5 generated
+    [critical] no-free-withdraw
+    [critical] total-supply-consistency
+    [high] owner-not-locked
+    [high] deposit-withdraw-symmetry
+    [high] no-arithmetic-overflow
+  [hunt] Running Hunt on generic scaffold...
+  [04:31:25] attempt 2/2: exploitable=true, body_len=1617, reason=The EmberETHVault contract has a reentrancy vulnerability in
+  [04:31:25] failed [EXECUTION_FAILURE]
+[hunt] access_control -> EmberProtocolConfig (challenge: emberprotocolconfig)
+  [scaffold] Generating generic scaffold...
+[scaffold] Compiles after 1 attempt(s)
+  [invariants] 2 generated
+    [high] owner-not-locked
+    [high] no-arithmetic-overflow
+  [hunt] Running Hunt on generic scaffold...
+  [04:32:40] attempt 1/2: exploitable=true, body_len=1024, reason=The EmberETHVault has a critical access control vulnerabilit
+  [04:32:41] failed [EXECUTION_FAILURE]
+  [04:32:51] attempt 2/2: exploitable=true, body_len=487, reason=The EmberETHVault has a critical access control vulnerabilit
+  [04:32:52] failed [EXECUTION_FAILURE]
+[hunt] delegatecall_injection -> EmberETHVault (challenge: embereth)
+  [scaffold] Generating generic scaffold...
+[scaffold] Compiles after 1 attempt(s)
+  [invariants] 5 generated
+    [critical] no-free-withdraw
+    [critical] total-supply-consistency
+    [high] owner-not-locked
+    [high] deposit-withdraw-symmetry
+    [high] no-arithmetic-overflow
+  [hunt] Running Hunt on generic scaffold...
+  [04:34:12] attempt 1/2: exploitable=, body_len=0, reason=The EmberETHVault is a UUPS upgradeable proxy. The exploit c
+[hunt] unchecked_external_call -> EmberETHVault (challenge: embereth)
+  [scaffold] Generating generic scaffold...
+[scaffold] Compiles after 1 attempt(s)
+  [invariants] 5 generated
+    [critical] no-free-withdraw
+    [critical] total-supply-consistency
+    [high] owner-not-locked
+    [high] deposit-withdraw-symmetry
+    [high] no-arithmetic-overflow
+  [hunt] Running Hunt on generic scaffold...
+  [04:36:41] attempt 1/2: exploitable=true, body_len=921, reason=The EmberProtocolConfig contract is an upgradeable contract 
+  [04:36:42] failed [EXECUTION_FAILURE]
+  [04:37:27] attempt 1/2: exploitable=true, body_len=1559, reason=The EmberETHVault's `processWithdrawalRequests` function unw
+  [04:37:28] failed [EXECUTION_FAILURE]
+  [04:38:33] attempt 2/2: exploitable=true, body_len=0, reason=
+  [04:39:08] attempt 2/2: exploitable=true, body_len=0, reason=
+
+=== 0 confirmed findings ===

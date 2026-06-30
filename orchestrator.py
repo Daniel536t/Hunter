@@ -1,7 +1,7 @@
 import asyncio, pathlib
 import config, db
 from recon import recon
-from solve import solve_challenge, find_challenge_test
+from solve import solve_challenge, solve_generic, find_challenge_test
 from llm import llm, HUNTER_MODEL
 from scaffold_autofix import generate_scaffold_autofix
 from generic_scaffold import assemble_test, extract_contracts
@@ -16,14 +16,19 @@ async def _process(task, repo, source, sem):
             if cname.lower() in contract.lower(): challenge = cdir; break
         if not challenge: challenge = contract.lower().replace("pool","").replace("vault","")
         print(f"[hunt] {atk} -> {contract} (challenge: {challenge})", flush=True)
+        
         dvd_test = find_challenge_test(repo, challenge)
+        if dvd_test:
+            dvd_src = dvd_test.read_text()
+            if 'checkSolvedByPlayer' not in dvd_src: dvd_test = None
+        
         if dvd_test:
             print(f"  [scaffold] Using DVD test", flush=True)
             from scaffold import use_existing_dvd_test, extract_dvd_symbols
             dvd = use_existing_dvd_test(repo, contract)
             available = extract_dvd_symbols(dvd["full_source"]) if dvd else ""
             task["available_symbols"] = available
-            finding = await solve_challenge(challenge=challenge, repo=repo, task=task, source_slice=source[:5000], llm_fn=llm, hunter_model=HUNTER_MODEL, max_iters=4)
+            finding = await solve_generic(challenge=challenge, repo=repo, task=task, source_slice=source[:5000], llm_fn=llm, hunter_model=HUNTER_MODEL, max_iters=2)
         else:
             print(f"  [scaffold] Generating generic scaffold...", flush=True)
             scaf = generate_scaffold_autofix(repo, contract)
@@ -33,14 +38,16 @@ async def _process(task, repo, source, sem):
                 ci = contracts[contract]
                 invariants = generate_invariants_from_abi(ci.abi, '', contract)
                 print(f"  [invariants] {len(invariants)} generated", flush=True)
+                for inv in invariants: print(f"    [{inv.severity}] {inv.name}", flush=True)
                 task["invariants"] = [{"name":i.name,"description":i.description} for i in invariants]
             task["available_symbols"] = scaf.abi_summary
             test_code = assemble_test(scaf, "// exploit here", "assertTrue(false, 'not yet exploited');")
             test_path = repo / "test" / f"Hunt_{contract}.t.sol"
             test_path.parent.mkdir(exist_ok=True, parents=True)
             test_path.write_text(test_code)
-            print(f"  [hunt] Generic scaffold ready for {contract}", flush=True)
-            return None
+            print(f"  [hunt] Running Hunt on generic scaffold...", flush=True)
+            finding = await solve_generic(challenge=challenge, repo=repo, task=task, source_slice=source[:5000], llm_fn=llm, hunter_model=HUNTER_MODEL, max_iters=2)
+        
         if finding:
             validation = finding["validation"]; reachability = {"reachable":True,"estimated_severity":"high"}
             is_new = db.save(str(repo), task, finding, validation, reachability)

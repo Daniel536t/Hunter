@@ -38,4 +38,4 @@ if __name__ == "__main__":
             task, finding, validation, reachability = item
             print(f"\n  CONFIRMED: {finding.get('challenge','?')} / {task.get('attack_class','?')}", flush=True)
             print(f"  Reasoning: {finding.get('reasoning','')[:200]}", flush=True)
-    finally: shutil.rmtree(repo.parent, ignore_errors=True)
+    finally: shutil.rmtree(repo, ignore_errors=True)
